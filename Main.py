@@ -1,7 +1,7 @@
 import Socket
 import CONFIG
 import DataContainer
-
+import sched, time
 
 def loading_complete(line):
     if("End of /NAMES list" in line):
@@ -24,17 +24,15 @@ def join_room(s):
             Loading = loading_complete(line)
     Socket.send_message(s, "Successfully joined chat")
 
-
-s = Socket.open_socket()
-join_room(s)
-
-x = True
 aCount = 0
 
-while x:
-    aCount += 1
+
+def run_drive(runobj):
     DataContainer.update_objects(20, .001)
     for line in str(s.recv(1024)).split('\\r\\n'):
+        if "PING" in line:
+            s.send(line.replace("PING", "PONG"))
+            break
         parts = line.split(':')
         if len(parts) < 3:
             continue
@@ -49,13 +47,15 @@ while x:
         for word in uniqueWordsList:
             DataContainer.add_to_container(word)
 
-        if("Hey" in parts[2]):
-           Socket.send_message(s,"Hello " +username)
-
         if(username == CONFIG.IDENT) and ("quit" in parts[2]):
             x = False
-
-    if aCount > 10:
-        aCount = 0
         print("displaying results")
         DataContainer.display_results()
+    runner.enter(.1, 1, run_drive,(runobj,))
+
+
+s = Socket.open_socket()
+join_room(s)
+runner = sched.scheduler(time.time,time.sleep)
+runner.enter(.1,1,run_drive,(runner,))
+runner.run()

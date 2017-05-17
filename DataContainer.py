@@ -28,7 +28,7 @@ def update_objects(decay,threshold):
         count = 0.0
         for obj in dataContainer[key]["list"]:
             obj.time += 1.0
-            obj.weight = obj.weight * (2.0-math.pow(math.e, (obj.time/4)/decay))
+            obj.weight = 2.0-math.pow(math.e, obj.time/(decay*2))
             #print("weight " + str(obj.time))
             if obj.weight < threshold:
                 #print("object removed!")
