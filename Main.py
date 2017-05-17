@@ -1,12 +1,16 @@
 import Socket
+import CONFIG
+import DataContainer
 
-def loadingComplete(line):
+
+def loading_complete(line):
     if("End of /NAMES list" in line):
         return False
     else:
         return True
 
-def joinRoom(s):
+
+def join_room(s):
     readbuffer = ""
     Loading = True
     while Loading:
@@ -17,27 +21,41 @@ def joinRoom(s):
         readbuffer = temp.pop()
 
         for line in temp:
-            Loading = loadingComplete(line)
+            Loading = loading_complete(line)
     Socket.send_message(s, "Successfully joined chat")
 
 
 s = Socket.open_socket()
-joinRoom(s)
+join_room(s)
 
 x = True
+aCount = 0
+
 while x:
+    aCount += 1
+    DataContainer.update_objects(20, .001)
     for line in str(s.recv(1024)).split('\\r\\n'):
         parts = line.split(':')
         if len(parts) < 3:
             continue
 
-        #if "QUIT" not in parts[1] and "JOIN" not in parts[1] and "PART" not in parts[1]:
-        #    message = parts[2][:len(parts[2])]
-
         username = parts[1].split("!")[0]
+        #print(username + ": " + parts[2])
+        splitMessage = parts[2].split(' ')
+        uniqueWordsList = []
+        for word in splitMessage:
+            if word not in uniqueWordsList:
+                uniqueWordsList.append(word)
+        for word in uniqueWordsList:
+            DataContainer.add_to_container(word)
 
-        print(username + ": " + parts[2])
         if("Hey" in parts[2]):
            Socket.send_message(s,"Hello " +username)
-        if((username == "latv_potato") and ("quit" in parts[2])):
+
+        if(username == CONFIG.IDENT) and ("quit" in parts[2]):
             x = False
+
+    if aCount > 10:
+        aCount = 0
+        print("displaying results")
+        DataContainer.display_results()

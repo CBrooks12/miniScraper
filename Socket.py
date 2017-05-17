@@ -12,3 +12,4 @@ def open_socket():
     s.send(bytes("PASS " + CONFIG.PASS + "\r\n", "UTF-8"))
     s.send(bytes("NICK " + CONFIG.IDENT + "\r\n", "UTF-8"))
     s.send(bytes("JOIN #" + CONFIG.CHANNEL + " \r\n", "UTF-8"))
+    return s
