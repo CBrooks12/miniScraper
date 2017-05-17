@@ -50,3 +50,11 @@ def display_results():
             print("Word: " + key)
             print("Number: " + str(len(value["list"])))
             print("Score: " + str(value["score"]))
+
+
+def get_top_score():
+    topScore = 0;
+    for key, value in dataContainer.items():
+        if value["score"] > topScore:
+            topScore = value["score"]
+    return topScore
