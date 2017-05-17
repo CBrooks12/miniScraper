@@ -58,3 +58,22 @@ def get_top_score():
         if value["score"] > topScore:
             topScore = value["score"]
     return topScore
+
+
+def update_lines(tCounter,lines,cap):
+    threshold = 3
+    for key, value in dataContainer.items():
+        if key not in lines:
+            if value["score"] > threshold:
+                aPkg = {"x":[tCounter],"y":[value["score"]]}
+                lines.update({key: aPkg})
+        else:
+            if all(i < threshold for i in lines[key]["y"]):
+                del lines[key]
+            else:
+                lines[key]["x"].append(tCounter)
+                lines[key]["y"].append(value["score"])
+                if len(lines[key]["x"]) > cap:
+                    lines[key]["x"].pop(0)
+                    lines[key]["y"].pop(0)
+    return lines

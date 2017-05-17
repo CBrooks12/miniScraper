@@ -8,18 +8,21 @@ import matplotlib.animation as animation
 topScores = []
 xArr = []
 tCounter = 0
-
+lines = {}
 
 def animate():
-    global tCounter
-    topScores.append(DataContainer.get_top_score())
+    global tCounter, lines
+    cap = 100
+    #topScores.append(DataContainer.get_top_score())
     tCounter += 1
-    xArr.append(tCounter)
-    if len(xArr)>1000:
-        xArr.pop(0)
-        topScores.pop(0)
+    lines = DataContainer.update_lines(tCounter,lines,cap)
     ax1.clear()
-    ax1.plot(xArr,topScores)
+    ax1.set_xlim(max(0,tCounter-100), tCounter)
+    i = 0
+    for key, value in lines.items():
+        i-=1
+        ax1.plot(value["x"], value["y"])
+
 
 
 def loading_complete(line):
@@ -75,6 +78,8 @@ def run_drive(i):
 
 fig = plt.figure()
 ax1 = fig.add_subplot(1, 1, 1)
+ax1.set_ylim(-0.25,20)
+ax1.text(0,0,"hello", fontsize=14)
 
 s = Socket.open_socket()
 join_room(s)
