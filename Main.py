@@ -17,11 +17,27 @@ def animate():
     tCounter += 1
     lines = DataContainer.update_lines(tCounter,lines,cap)
     ax1.clear()
-    ax1.set_xlim(max(0,tCounter-100), tCounter)
+    ax1.set_xlim(max(0,tCounter-cap), tCounter)
     i = 0
+    tableObj = [{"word":"null", "score":0}]
+    scores = []
+    words = []
+    col = ["Word","Score"]
     for key, value in lines.items():
-        i-=1
+        i -= 1
         ax1.plot(value["x"], value["y"])
+        obj = {"word":key, "score":value["y"][-1]}
+        tableObj.append(obj)
+    tableObj.sort(key=lambda x: x["score"],reverse=True)
+    for q in range(5):
+        if len(tableObj) > q:
+            scores.append([tableObj[q]["word"],str("%.2f" % tableObj[q]["score"])])
+            #words.append(tableObj[q]["word"])
+            words.append("")
+    ax1.table(cellText=scores, cellLoc='center',
+              rowLabels=words,
+              colLabels=col,
+              loc='bottom')
 
 
 
@@ -70,16 +86,15 @@ def run_drive(i):
 
         if(username == CONFIG.IDENT) and ("quit" in parts[2]):
             x = False
-
     # print("displaying results")
     # DataContainer.display_results()
     animate()
     #runner.enter(.1, 1, run_drive,(runobj,))
 
 fig = plt.figure()
-ax1 = fig.add_subplot(1, 1, 1)
-ax1.set_ylim(-0.25,20)
+ax1 = fig.add_subplot(2, 1, 1)
 ax1.text(0,0,"hello", fontsize=14)
+ax1.axes.get_xaxis().set_visible(False)
 
 s = Socket.open_socket()
 join_room(s)
